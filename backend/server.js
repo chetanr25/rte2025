@@ -1,6 +1,8 @@
 import express from "express";
 import fs from "fs";
 import cors from "cors";
+import { spawn } from "child_process";
+
 
 const app = express();
 app.use(cors());
@@ -25,6 +27,38 @@ app.post("/templates/:id", (req, res) => {
     res.json({ message: "Template saved successfully!" });
   } else {
     res.status(404).json({ message: "Template not found" });
+  }
+});
+
+app.post("/run-python", async (req, res) => {
+  try {
+    const { body } = req.body;
+    console.log(" Received from frontend:", body);
+
+    const bodyStr = JSON.stringify(body);
+    // transcripcion string
+    // lista 
+    // direccion del pdf
+    const process = spawn("python", ["run_script.py", bodyStr.]);
+
+    let output = "";
+    let errorOutput = "";
+
+    process.stdout.on("data", (data) => (output += data.toString()));
+    process.stderr.on("data", (data) => (errorOutput += data.toString()));
+
+    process.on("close", (code) => {
+      console.log(` Python script finished with code ${code}`);
+      if (errorOutput) console.error(" Python Error:", errorOutput);
+
+      res.json({
+        success: code === 0,
+        output: output || errorOutput || "No output from Python",
+      });
+    });
+  } catch (err) {
+    console.error(" Error in /run-python:", err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

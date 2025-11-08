@@ -209,8 +209,24 @@ export default function Transcription() {
     setTemplates(templatesData)
   }, [])
 
-  function generateReport() {
-    alert('Generate Report clicked! (not implemented)')
+  const generateReport = async () => {
+    try {
+      const res = await fetch(`http://localhost:4000/run-python`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          // transcripcion string
+          template: templates,
+          pdf: path
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save template");
+      alert("Template saved successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Error saving template.");
+    }
   }
 
   return (
