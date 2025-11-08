@@ -209,15 +209,47 @@ export default function Transcription() {
     setTemplates(templatesData)
   }, [])
 
+  const [selectedTemplateIds, setSelectedTemplateIds] = useState<string[]>([])
+
+  // Attach a change listener to the <select> to pick up user selections
+  useEffect(() => {
+    const sel = document.querySelector<HTMLSelectElement>('select[aria-label="Select templates"]')
+    if (!sel) return
+    const handler = () => {
+      const vals = Array.from(sel.selectedOptions).map(o => o.value)
+      setSelectedTemplateIds(vals)
+    }
+    sel.addEventListener('change', handler)
+    // initialize from current selection
+    handler()
+    return () => sel.removeEventListener('change', handler)
+  }, [templates])
+
+  // Build fields only for templates currently selected in the selector
+  const generateFields: string[] = Array.from(
+    new Set(
+      templates
+        .filter((t, i) => {
+          const id = (t as any).id ?? i
+          return selectedTemplateIds.map(String).includes(String(id))
+        })
+        .flatMap(t => {
+          const fields = Array.isArray((t as any).fields) ? (t as any).fields : []
+          return fields.map((f: any) => (f?.label ? String(f.label) : null)).filter(Boolean)
+        })
+    )
+  )
+
   const generateReport = async () => {
+    console.log("Generating report with templates:", generateFields);
     try {
       const res = await fetch(`http://localhost:4000/run-python`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           transcription: transcript,
-          template: templates,
-          pdf: path
+          template: generateFields,
+          pdf: "/src/inputs/file.pdf"
         }),
       });
 
