@@ -1,0 +1,134 @@
+[
+  {
+    "id": 1,
+    "name": "Wildfire Incident Report",
+    "description": "Template for collecting wildfire incident reports",
+    "file": "",
+    "fields": [
+      {
+        "id": 1,
+        "label": "Incident Name",
+        "type": "text"
+      },
+      {
+        "id": 2,
+        "label": "Location",
+        "type": "text"
+      },
+      {
+        "id": 3,
+        "label": "Dateaswea",
+        "type": "date"
+      },
+      {
+        "id": 4,
+        "label": "as",
+        "type": "text"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Flooding Incident Report",
+    "description": "Template for collecting flooding incident reports",
+    "file": "",
+    "fields": [
+      {
+        "id": 1,
+        "label": "Incident Name",
+        "type": "text"
+      },
+      {
+        "id": 2,
+        "label": "Location",
+        "type": "text"
+      },
+      {
+        "id": 3,
+        "label": "Date",
+        "type": "date"
+      },
+      {
+        "id": 4,
+        "label": "Description",
+        "type": "textarea"
+      },
+      {
+        "id": 5,
+        "label": "Water Level",
+        "type": "number"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Power Outage Report",
+    "description": "Template for reporting power outages and affected infrastructure",
+    "file": "",
+    "fields": [
+      {
+        "id": 1,
+        "label": "Incident Name",
+        "type": "text"
+      },
+      {
+        "id": 2,
+        "label": "Location",
+        "type": "text"
+      },
+      {
+        "id": 3,
+        "label": "Date",
+        "type": "date"
+      },
+      {
+        "id": 4,
+        "label": "Duration (hours)",
+        "type": "number"
+      },
+      {
+        "id": 5,
+        "label": "Affected Households",
+        "type": "number"
+      },
+      {
+        "id": 6,
+        "label": "Notes",
+        "type": "textarea"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Evacuation Volunteer Signup",
+    "description": "Template for registering volunteers for evacuation assistance",
+    "file": "",
+    "fields": [
+      {
+        "id": 1,
+        "label": "Full Name",
+        "type": "text"
+      },
+      {
+        "id": 2,
+        "label": "Email Address",
+        "type": "email"
+      },
+      {
+        "id": 3,
+        "label": "Phone Number",
+        "type": "text"
+      },
+      {
+        "id": 4,
+        "label": "Available Dates",
+        "type": "text"
+      },
+      {
+        "id": 5,
+        "label": "Skills / Certificationsasd",
+        "type": "text"
+      }
+    ]
+  }
+]
