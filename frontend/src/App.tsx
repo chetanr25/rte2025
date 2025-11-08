@@ -1,10 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Form } from "react-router-dom";
 import Home from "./pages/Home";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Reports from "./pages/Reports";
-import FormTemplates from "./pages/FormTemplates";
 import DashboardInfo from "./pages/DashboardInfo";
 import Analytics from "./pages/Analytics";
+import ListTemplates from "./pages/ListTemplates";
+import FormTemplates from "./pages/FormTemplates";
 
 function App() {
   return (
@@ -14,7 +15,8 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route path="" element={<DashboardInfo />} />
           <Route path="reports" element={<Reports />} />
-          <Route path="form-templates" element={<FormTemplates />} />
+          <Route path="form-templates" element={<ListTemplates />} />
+          <Route path="form-templates/create" element={<FormTemplates />} />
           <Route path="analytics" element={<Analytics />} />
         </Route>
       </Routes>
