@@ -32,29 +32,66 @@ app.post("/templates/:id", (req, res) => {
 
 app.post("/run-python", async (req, res) => {
   try {
-    const { body } = req.body;
-    console.log(" Received from frontend:", body);
+    // Accept either flat body or body.body wrapper
+    const payload = req.body && req.body.body ? req.body.body : req.body || {};
+    let { transcription, template, pdf } = payload;
 
-    const bodyStr = JSON.stringify(body);
-    // transcripcion string
-    // lista 
-    // direccion del pdf
-    const process = spawn("python", ["../src/main.py", bodyStr.transcription, bodyStr.template, bodyStr.pdf]);
+    if (!transcription) {
+      return res.status(400).json({ success: false, error: "Missing 'transcription'" });
+    }
+
+    // If template is not provided, use the first template's field labels
+    if (!template || !Array.isArray(template)) {
+      try {
+        const data = JSON.parse(fs.readFileSync(DB_PATH, "utf-8"));
+        const first = Array.isArray(data) && data.length ? data[0] : null;
+        template = first?.fields?.map((f) => f.label) || [];
+      } catch {
+        template = [];
+      }
+    }
+
+    // Resolve default/sample PDF if not provided or invalid
+    const defaultPdf = new URL("../src/inputs/file.pdf", import.meta.url).pathname;
+    if (!pdf || typeof pdf !== "string" || !fs.existsSync(pdf)) {
+      pdf = defaultPdf;
+    }
+
+    const scriptPath = new URL("../src/main.py", import.meta.url).pathname;
+    const py = process.env.PYTHON || "python3"; // macOS typically uses python3
+    const args = [
+      scriptPath,
+      String(transcription),
+      JSON.stringify(template || []),
+      String(pdf),
+    ];
 
     let output = "";
     let errorOutput = "";
 
-    process.stdout.on("data", (data) => (output += data.toString()));
-    process.stderr.on("data", (data) => (errorOutput += data.toString()));
+    const child = spawn(py, args);
+    child.on("error", (err) => {
+      if (err && err.code === "ENOENT") {
+        // Fallback to 'python'
+        const child2 = spawn("python", args);
+        child2.stdout?.on("data", (d) => (output += d.toString()));
+        child2.stderr?.on("data", (d) => (errorOutput += d.toString()));
+        child2.on("close", (code) => {
+          console.log(` Python script finished with code ${code}`);
+          if (errorOutput) console.error(" Python Error:", errorOutput);
+          res.json({ success: code === 0, output: output || errorOutput || "No output from Python" });
+        });
+      } else {
+        res.status(500).json({ success: false, error: String(err?.message || err) });
+      }
+    });
 
-    process.on("close", (code) => {
+    child.stdout?.on("data", (d) => (output += d.toString()));
+    child.stderr?.on("data", (d) => (errorOutput += d.toString()));
+    child.on("close", (code) => {
       console.log(` Python script finished with code ${code}`);
       if (errorOutput) console.error(" Python Error:", errorOutput);
-
-      res.json({
-        success: code === 0,
-        output: output || errorOutput || "No output from Python",
-      });
+      res.json({ success: code === 0, output: output || errorOutput || "No output from Python" });
     });
   } catch (err) {
     console.error(" Error in /run-python:", err);

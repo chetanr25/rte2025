@@ -246,6 +246,7 @@ export default function Transcription() {
 
   const generateReport = async () => {
     console.log("Generating report with templates:", generateFields);
+    console.log(transcript);
     try {
       const res = await fetch(`http://localhost:4000/run-python`, {
         method: "POST",
