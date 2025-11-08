@@ -1,13 +1,15 @@
 import json
 import requests
 
+
+
 class textToJSON():
-    def __init__(self, transcript_text, target_fields, json="{"):
+    def __init__(self, transcript_text, target_fields, json={}):
         self.__transcript_text = transcript_text # str
         self.__target_fields = target_fields # List, contains the template field.
+        self.__json = json # dictionary
         self.type_check_all()
         self.main_loop()
-        self.__json = json
 
     
     def type_check_all(self):
@@ -58,13 +60,56 @@ class textToJSON():
             json_data = response.json()
             parsed_response = json_data['response']
             print(parsed_response)
-            self.__json += f'\n\t"{field}": "{parsed_response}",'
-        self.__json += '\n}'
-        print(self.__json)
+            self.add_response_to_json(field, parsed_response)
+            
+        print("----------------------------------")
+        print(json.dumps(self.__json, indent=2))
+        print("--------- extracted data ---------")
+
         return None
 
+    def add_response_to_json(self, field, value):
+        """ 
+            this method adds the following value under the specified field, 
+            or under a new field if the field doesn't exist, to the json dict 
+        """
+        value = value.strip().replace('"', '')
+        parsed_value = None
+
+        if value == "-1":
+            parsed_value = None # None is not found
+        elif ";" in value: 
+            parsed_value = [ elem.strip() for elem in value.split(';') ]
+        else:
+            parsed_value = value
+
+        
+        if field not in self.__json.keys():
+            self.__json[field] = value
+        else:
+            self.__json[field].append(value)
+        
+        return
+
+    def get_data(self):
+        return self.__json
+
+
 if __name__ == "__main__":
+    from json_manager import JsonManager
+
     text = "Officer Voldemort here, at an incident reported at 456 Oak Street. Two victims, Mark Smith and Jane Doe. Medical aid rendered for minor lacerations. Handed off to Sheriff's Deputy Alvarez. End of transmission."
     fields = ["reporting_officer", "incident_location", "amount_of_victims", "victim_name_s", "assisting_officer"]
-    t2j = textToJSON(text, fields)
 
+
+    output_file = './test/test_output_1.json'
+    print("Extracting data from text...")
+    t2j = textToJSON(text, fields)
+    
+    extracted_data = t2j.get_data()
+
+    print(f"Saving data to {output_file}...")
+    manager = JsonManager()
+    manager.save_json(extracted_data, output_file)
+
+    print("-------------- PROCESS FINISHED SUCCESSFULLY ----------------- ")
