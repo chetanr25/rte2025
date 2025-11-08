@@ -59,10 +59,11 @@ class textToJSON():
             # parse response
             json_data = response.json()
             parsed_response = json_data['response']
-            print(parsed_response)
+            # print(parsed_response)
             self.add_response_to_json(field, parsed_response)
             
         print("----------------------------------")
+        print("\t[LOG] Resulting JSON created from the input text:")
         print(json.dumps(self.__json, indent=2))
         print("--------- extracted data ---------")
 
@@ -75,21 +76,46 @@ class textToJSON():
         """
         value = value.strip().replace('"', '')
         parsed_value = None
-
-        if value == "-1":
-            parsed_value = None # None is not found
-        elif ";" in value: 
-            parsed_value = [ elem.strip() for elem in value.split(';') ]
-        else:
-            parsed_value = value
-
+        plural = False
+ 
+        if value != "-1":
+            parsed_value = value       
         
-        if field not in self.__json.keys():
-            self.__json[field] = value
-        else:
-            self.__json[field].append(value)
-        
+        if ";" in value:
+            parsed_value = self.handle_plural_values(value)
+            plural = True
+
+
+        if field in self.__json.keys():
+            self.__json[field].append(parsed_value)
+        else: 
+            self.__json[field] = parsed_value
+                
         return
+
+    def handle_plural_values(self, plural_value):
+        """ 
+            This method handles plural values.
+            Takes in strings of the form 'value1; value2; value3; ...; valueN' 
+            returns a list with the respective values -> [value1, value2, value3, ..., valueN]
+        """
+        if ";" not in plural_value:
+            raise ValueError(f"Value is not plural, doesn't have ; separator, Value: {plural_value}")
+        
+        print(f"\t[LOG]: Formating plural values for JSON, [For input {plural_value}]...")
+        values = plural_value.split(";")
+        
+        # Remove trailing leading whitespace
+        for i in range(len(values)):
+            current = i+1 
+            if current < len(values):
+                clean_value = values[current].lstrip()
+                values[current] = clean_value
+
+        print(f"\t[LOG]: Resulting formatted list of values: {values}")
+        
+        return values
+        
 
     def get_data(self):
         return self.__json

@@ -4,13 +4,11 @@ Name: X
 __Collaborators:__ Juan Alvarez, Manuel Carrido, Jan Sans, Marc Verges, Vincent Harkins.
 
 Subteam: 
-- Backend
-- z
-## Notes:
-Open source tools needed:
-- Latex pdf parser
+- Backend: Juan, Vincent, Manuel.
+- Frontend: Jan, Marc.
 
-Inputs:
+## Notes:
+Ideas for Inputs:
 - Radio transcript in text of the incident (we assume it's already transcribed).
 - Radio input directly from the user (firefighter).
     - initially this input will be in text.
