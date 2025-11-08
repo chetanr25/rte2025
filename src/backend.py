@@ -139,11 +139,7 @@ class Fill():
         t2j = textToJSON(user_input, definitions)
         textbox_answers = t2j.get_data()  # This is a dictionary
 
-        # --- FIX 1: Convert the dictionary's values to a list ---
-        # This relies on your 'definitions' list and the LLM's
-        # output matching the PDF's field order.
         answers_list = list(textbox_answers.values())
-        # --- END FIX ---
 
         # Read PDF 
         pdf = PdfReader(pdf_form)
@@ -161,7 +157,6 @@ class Fill():
                     if annot.Subtype == '/Widget' and annot.T:
                         field_name = annot.T[1:-1]
                         
-                        # --- FIX 2: Use the 'answers_list' and check bounds ---
                         if i < len(answers_list):
                             annot.V = f'{answers_list[i]}'
                             annot.AP = None
@@ -169,36 +164,9 @@ class Fill():
                         else:
                             # Stop if we run out of answers
                             break 
-                        # --- END FIX ---
 
         PdfWriter().write(output_pdf, pdf)
         
-        # --- FIX 3: Return the output path ---
         # Your main.py expects this function to return the path
         return output_pdf
 
-    """ 
-if __name__ == "__main__":
-
-    
-    output_file = './src/outputs/test_output_1.json'
-    input_file = './src/inputs/input.txt'
-    
-
-    input_manager = InputManager()
-    text = input_manager.file_to_text(input_file)
-    fields = ["reporting_officer", "incident_location", "amount_of_victims", "victim_name_s", "assisting_officer"]
-
-    
-    print("Extracting data from text...")
-    t2j = textToJSON(text, fields)
-    
-    extracted_data = t2j.get_data()
-
-    print(f"Saving data to {output_file}...")
-    manager = JsonManager()
-    manager.save_json(extracted_data, output_file)
-
-    print("-------------- PROCESS FINISHED SUCCESSFULLY ----------------- ")
-    """ 
-    

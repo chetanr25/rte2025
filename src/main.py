@@ -1,5 +1,5 @@
 import os
-from backend import Fill  # Imports your core function
+from backend import Fill  
 
 def run_pdf_fill_process(user_input: str, definitions: list, pdf_form_path: str):
     """
@@ -15,7 +15,6 @@ def run_pdf_fill_process(user_input: str, definitions: list, pdf_form_path: str)
         print(f"Error: PDF template not found at {pdf_form_path}")
         return None # Or raise an exception
 
-    # 3. Run the main fill_form function from backend.py
     print("[3] Starting extraction and PDF filling process...")
     try:
         output_name = Fill.fill_form(
@@ -28,7 +27,6 @@ def run_pdf_fill_process(user_input: str, definitions: list, pdf_form_path: str)
         print(f"✅ Process Complete.")
         print(f"Output saved to: {output_name}")
         
-        # 4. Return the path to the new file
         return output_name
         
     except Exception as e:
@@ -36,8 +34,6 @@ def run_pdf_fill_process(user_input: str, definitions: list, pdf_form_path: str)
         # Re-raise the exception so the frontend can handle it
         raise e
 
-# You no longer need an if __name__ == "__main__": block
-# Your Flask/frontend server will import and call run_pdf_fill_process()
 
 if __name__ == "__main__":
     file = "/home/juan/Documents/california/UCSC/rte2025/src/inputs/file.pdf"
