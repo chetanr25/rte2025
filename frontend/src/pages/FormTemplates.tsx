@@ -1,61 +1,98 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useEffect } from "react"
+import { Link, useParams } from "react-router-dom"
+import type { Template } from "@/types/template"
+import templatesData from "@/db/db.json"
+import { Label } from "@radix-ui/react-label"
+import { Trash } from "lucide-react"
 
 export default function TemplatesPage() {
-  const [db, setDb] = useState<Record<string, unknown> | null>(null)
+  const { id } = useParams();
+
+  const [templates, setTemplates] = useState<Template[]>([])
 
   useEffect(() => {
-    let mounted = true
-    fetch("/db/db.json")
-      .then((res) => {
-        if (!res.ok) throw new Error(`Failed to fetch db.json: ${res.status}`)
-        return res.json()
-      })
-      .then((json) => {
-        if (mounted) setDb(json)
-      })
-      .catch((err) => console.error("Error loading db.json:", err))
-
-    return () => {
-      mounted = false
-    }
+    setTemplates(templatesData)
   }, [])
 
-  const firstElement: unknown | undefined = db
-    ? Array.isArray(db)
-      ? db[0]
-      : Object.values(db)[0]
-    : undefined
+  const template = templates.find(t => String(t.id) === id);
+
+  const [fields, setFields] = useState<Template['fields']>([])
 
   useEffect(() => {
-    if (firstElement !== undefined) {
-      console.log("First element from db:", firstElement)
-    }
-  }, [firstElement])
+    setFields(template ? template.fields : [])
+  }, [template])
 
-  const [fields, setFields] = useState([{ id: 1, label: "Field 1" }])
+  // const fields = template ? template.fields : [];
+
+  console.log('Template:', template);
+  console.log('Fields:', fields);
 
   const addField = () => {
-    setFields([...fields, { id: fields.length + 1, label: `Field ${fields.length + 1}` }])
+    setFields(prev => [
+      ...prev,
+      { id: (prev.length || 0) + 1, label: ``, type: "text" }
+    ])
   }
+
+  const save = async () => {
+    if (!template) return;
+
+    const updatedTemplate = { ...template, fields };
+
+    try {
+      const res = await fetch(`http://localhost:4000/templates/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTemplate),
+      });
+
+      if (!res.ok) throw new Error("Failed to save template");
+      alert("Template saved successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Error saving template.");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white px-8">
       <h1 className="text-4xl font-bold text-orange-500 mb-8">FireForm</h1>
 
       <div className="w-full max-w-3xl space-y-6">
-        <h2 className="text-2xl font-bold">Template 1</h2>
+        <h2 className="text-2xl font-bold">Template ID: {id}</h2>
 
         <div className="grid grid-cols-2 gap-4">
-          <Input placeholder="template name" />
-          <Input placeholder="upload document" type="file" />
+          <Label htmlFor="template-name" className="font-medium">Template Name</Label>
+          <Label htmlFor="upload-document" className="font-medium">Upload Document</Label>
+          <Input id="template-name" value={template?.name} />
+          <Input id="upload-document" placeholder="upload document" type="file" />
         </div>
+        <hr className="w-full my-4 border-gray-200 border-0.5" />
+        <p>Inputs in the template will be:</p>
 
         {fields.map((field) => (
-          <div key={field.id}>
-            <Input placeholder={field.label} />
+          <div key={field.id} className="flex gap-5">
+            <Input value={field.label} onChange={(e) => {
+              const newLabel = e.target.value;
+              setFields(prev => prev.map(f => f.id === field.id ? { ...f, label: newLabel } : f));
+            }} />
+            <Button
+              variant="outline"
+              className="ml-2 text-red-600"
+              onClick={() =>
+                setTemplates(prev =>
+                  prev.map(t =>
+                    String(t.id) === id
+                      ? { ...t, fields: t.fields.filter(f => f.id !== field.id) }
+                      : t
+                  )
+                )
+              }
+            >
+              <Trash className="size-3.5" />
+            </Button>
           </div>
         ))}
 
@@ -67,8 +104,13 @@ export default function TemplatesPage() {
           Add more
         </Button>
 
-        <div className="flex justify-end">
-          <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+        <div className="flex justify-end gap-5">
+          <Link to="/dashboard/form-templates">
+            <Button variant="outline" className="text-gray-700">
+              Go Back
+            </Button>
+          </Link>
+          <Button className="bg-gradient-to-r from-orange-500 to-red-500 text-white" onClick={save}>
             Save Template
           </Button>
         </div>

@@ -16,7 +16,7 @@ function App() {
           <Route path="" element={<DashboardInfo />} />
           <Route path="reports" element={<Reports />} />
           <Route path="form-templates" element={<ListTemplates />} />
-          <Route path="form-templates/create" element={<FormTemplates />} />
+          <Route path="form-templates/create/:id" element={<FormTemplates />} />
           <Route path="analytics" element={<Analytics />} />
         </Route>
       </Routes>

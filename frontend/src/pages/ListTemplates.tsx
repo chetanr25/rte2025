@@ -2,21 +2,14 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import type { Template } from "@/types/template"
 
-// Importamos el JSON local
 import templatesData from "@/db/db.json"
 
-interface Template {
-  id: number
-  name: string
-  description: string
-  fields: { id: number; label: string; type: string }[]
-}
 
 export default function ListTemplates() {
   const [templates, setTemplates] = useState<Template[]>([])
 
-  // Cargar datos desde el JSON local al montar el componente
   useEffect(() => {
     setTemplates(templatesData)
   }, [])
@@ -43,12 +36,14 @@ export default function ListTemplates() {
               </p>
             </CardContent>
             <CardFooter>
-              <Button
-                variant="default"
-                className="bg-gradient-to-r from-orange-500 to-red-500 text-white w-full"
-              >
-                Check template
-              </Button>
+              <Link to={`/dashboard/form-templates/create/${template.id}`}>
+                <Button
+                  variant="default"
+                  className="bg-gradient-to-r from-orange-500 to-red-500 text-white w-full"
+                >
+                  Check template
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
         ))}
