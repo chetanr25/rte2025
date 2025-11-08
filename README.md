@@ -1,11 +1,20 @@
 # Reboot the Earth - Hackathon project
 Name: X
 
-Collaborators: 
+__Collaborators:__ Juan Alvarez, Manuel Carrido, Jan Sans, Marc Verges, Vincent Harkins.
 
-## Challenges:
+Subteam: 
+- Backend
+- z
+## Notes:
+Open source tools needed:
+- Latex pdf parser
 
+Inputs:
+- Radio transcript in text of the incident (we assume it's already transcribed).
+- Radio input directly from the user (firefighter).
+    - initially this input will be in text.
+- Initial input will be in __text__ -> to be scaled to voice later. 
 
 ## To-Dos:
-
 
