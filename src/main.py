@@ -36,7 +36,9 @@ def run_pdf_fill_process(user_input: str, definitions: list, pdf_form_path: str)
 
 
 if __name__ == "__main__":
-    file = "/home/juan/Documents/california/UCSC/rte2025/src/inputs/file.pdf"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file = os.path.join(script_dir, "inputs", "file.pdf")
     input = "Hi. The employee's name is John Doe. His job title is managing director. His department supervisor is Jane Doe. His phone number is 123456. His email is jdoe@ucsc.edu. The signature is <Mamañema>, and the date is 01/02/2005"
     descriptions = ["Employee's name", "Employee's job title", "Employee's department supervisor", "Employee's phone number", "Employee's email", "Signature", "Date"]
     run_pdf_fill_process(input, descriptions, file)
+    
